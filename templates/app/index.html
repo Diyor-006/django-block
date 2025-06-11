@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<div class="container mt-4">
+    <h1 class="mb-4">
+        Все Посты
+    </h1>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md3 row-cols-lg-4 g-4">
+        {% for post in posts %}
+        {% include 'components/post_card.html' %}
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

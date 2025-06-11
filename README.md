@@ -1,1 +1,1 @@
-# django-block
+# django_blog_sep242

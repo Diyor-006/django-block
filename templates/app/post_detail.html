@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        {% if post.get_first_media %}
+            {% if post.get_first_media.url %}
+                <img src="{{ post.get_first_media.url }}" alt="" class="card-img-top img-fluid">
+            {% else %}
+                <img src="{{ post.get_first_media.url }}" alt="" class="card-img-top img-fluid">
+            {% endif %}
+        {% endif %}
+        <div class="card-body">
+            <h2 class="card-title">
+                {{ post.title }}
+            </h2>
+            <p class="text-muted">
+                Автор : {{ post.author.username }}
+            </p>
+            <p class="text-muted">
+                Дата создания: {{ post.created_at }}
+            </p>
+            <p class=" card-text">
+                {{ post.content}}
+            </p>
+            <div class="d-flex justify-content-between">
+                <a href="#" class="btn btn-outline-success">
+                    Лайк {{post.likes_count}}
+                </a>
+                <a href="#" class="btn btn-outline-danger">
+                    Дизлайк {{post.dislikes_count}}
+                </a>
+                <a href="#" class="btn btn-outline-warning">
+                    КОММЕНТ {{post.comment_count}}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock main %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<div class="container mt-4">
+    <h2 class="mg-3">
+        Создать Пост
+    </h2>
+    <form method="post" class="card p-4 shadow-sm" encttpe="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+        </div>
+        <div class="mb-3">
+            {{ form.content.label_tag }}
+            {{ form.content }}
+        </div>
+        <button type="submit" class="btn btn-primary">
+            Опубликовать
+        </button>
+    </form>
+</div>
+
+{% endblock main %}

@@ -1,0 +1,34 @@
+<div class="card mb-3 h-100 m-3">
+    {% if post.get_first_media %}
+    {% if post.get_first_media.file %}
+    <img src="{{ post.get_first_media.file.url }}" alt="" class="card-img-top">
+    {% else %}
+    <img src="{{ post.get_first_media.url }}" alt="" class="card-img-top">
+    {% endif %}
+    {% else %}
+    <img src="https://thumbs.dreamstime.com/b/%D0%BD%D0%B5%D1%82-%D0%B4%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%BD%D1%8B%D1%85-%D0%B2%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%BD%D1%8B%D1%85-%D0%B7%D0%BD%D0%B0%D1%87%D0%BA%D0%BE%D0%B2-%D0%B8%D0%B7%D0%BE%D0%B1%D1%80%D0%B0%D0%B6%D0%B5%D0%BD%D0%B8%D0%B9-%D0%BF%D0%BE-%D1%83%D0%BC%D0%BE%D0%BB%D1%87%D0%B0%D0%BD%D0%B8%D1%8E-%D1%81%D0%BA%D0%BE%D1%80%D0%BE-241773768.jpg"
+         alt="" class="card-img-top">
+    {% endif %}
+    <div class="card-body">
+        <h5 class="card-title">
+            {{ post.title }}
+        </h5>
+        <p class="card-text">
+            {{ post.content|truncatechars:100 }}
+        </p>
+        <p class="text-muted mb-2">
+            Автор: {{ post.author.username }}
+        </p>
+    </div>
+    <div class="card-footer d-flex justify-content-between text-muted">
+        <small>
+            Лайки: {{ post.get_likes_count }}
+        </small>
+        <small>
+            ДизЛайки: {{ post.get_likes_count }}
+        </small>
+        <small>
+            Комменты: {{ post.get_comments_count }}
+        </small>
+    </div>
+</div>
