@@ -31,4 +31,5 @@
             Комменты: {{ post.get_comments_count }}
         </small>
     </div>
+    <a href="{% url "post-detail" post.pk %}" class="btn btn-outline-primary">Читать дальше</a>
 </div>

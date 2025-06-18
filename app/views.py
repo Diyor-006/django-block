@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView
-from app.models import Post
-from app.forms import PostForm, CustomUserCreationForm
+from django.contrib.auth.models import User
+from app.models import Post, Like, DisLike, Report
+from app.forms import PostForm, CustomUserCreationForm, CommentForm, ReportForm, UserChangeForm
+from django.contrib.auth.decorators import login_required
 
 # TODO: Сделать Страницу Главную Index
 class IndexView(ListView):
@@ -74,7 +76,11 @@ class PostDetailView(DetailView):
     template_name = "app/post_detail.html"
     # Имя Переменной в Шаблон
     context_object_name = "post"
-
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["comment_form"] = CommentForm()
+        return context
 
 # TODO: Сделать Страницу Изменение Поста
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -93,6 +99,10 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         """
         post = self.get_object()
         return self.request.user == post.author
+
+    
+
+    
 
 
 # TODO: Сделать Страницу Подтверждение Удаления
@@ -138,3 +148,109 @@ class CustomLoginView(LoginView):
     template_name = "app/login.html"
     success_url = reverse_lazy("index")
 
+@login_required
+
+def like_post(request, post_id):
+    if request.method == "POST":
+        post = get_object_or_404(Post, pk=post_id)
+
+        DisLike.objects.filter(post=post, user=request.user).delete()
+
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
+
+        if not created:
+            like.delete()
+
+        return redirect("post-detail", post_id)
+
+def dislike_post(request, post_id):
+    if request.method == "POST":
+        post = get_object_or_404(Post, pk=post_id)
+
+        Like.objects.filter(post=post, user=request.user).delete()
+
+        dislike, created = DisLike.objects.get_or_create(user=request.user, post=post)
+
+        if not created:
+            dislike.delete()
+
+        return redirect("post-detail", post_id)
+        
+def create_comment(request, post_id):
+    if request.method == "POST":
+        post = get_object_or_404(Post, pk=post_id)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user
+            comment.post = post
+            comment.save()
+            return redirect("post-detail", post_id)
+        else:
+            return redirect("post-detail", post_id)
+    else:
+        return redirect("post-detail", post_id)
+
+def about_us(request):
+    pass
+
+@login_required
+# TODO: Создание Жалоб
+def create_report(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    if request.method == "POST":
+        form = ReportForm(request.POST)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.user = request.user
+            report.post = post
+            report.save()
+            return redirect("index")
+        else:
+            form = ReportForm()
+            return render(
+                request,
+                "app/report_form.html",
+                {
+                    "form": form,
+                    "post_id": post_id
+                }
+            )
+    else:
+        form = ReportForm()
+        return render(
+                request,
+                "app/report_form.html",
+                {
+                    "form": form,
+                    "post_id": post_id
+                }
+            )
+
+
+# TODO: Получение Списка Жалоб
+class ReportListView(ListView):
+    model = Report 
+    template_name = "app/report_list.html"
+    context_object_name = "reports"
+
+    def get_queryset(self):
+        return Report.object.filter(user=self.request.user)
+
+
+@login_required
+def profile_view(request):
+    user = get_object_or_404(User, request.user)
+    return render(
+        request,
+        "app/profile.html",
+        {
+            "user": user
+        }
+    )
+
+class UserUpdateView(UpdateView):
+    form_class = UserChangeForm
+    template_name = "app/user_form.html"
+    success_url = reverse_lazy("index")
+    model =User
